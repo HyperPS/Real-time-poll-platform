@@ -9,6 +9,7 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
+![Demo](molhit.gif)
 
 ## 📋 Table of Contents
 
