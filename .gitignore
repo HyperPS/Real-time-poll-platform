@@ -1,0 +1,69 @@
+# Git ignore rules for Real-Time Poll Platform
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# System
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Dependencies
+vendor/
+node_modules/
+
+# Cache
+cache/
+*.cache
+
+# Session files
+sessions/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Database
+*.sqlite
+*.sqlite3
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Build files
+dist/
+build/
+.build/
+
+# Test coverage
+coverage/
+.coverage
+
+# Package lock files (you can decide)
+composer.lock
+package-lock.json
+yarn.lock
+
+# IDE specific
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
