@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: poll_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass123
+      MYSQL_DATABASE: polling_system
+      MYSQL_USER: polluser
+      MYSQL_PASSWORD: pollpass123
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./database/init:/docker-entrypoint-initdb.d
+      - poll_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpass123"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: poll_app
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_NAME: polling_system
+      DB_USER: polluser
+      DB_PASS: pollpass123
+
+volumes:
+  poll_db_data:

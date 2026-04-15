@@ -81,4 +81,33 @@ class Poll
 
         return $poll;
     }
+
+    public function getAllWithVoteCounts()
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT p.*, COUNT(v.id) as vote_count
+            FROM polls p
+            LEFT JOIN votes v ON p.id = v.poll_id AND v.is_active = 1
+            GROUP BY p.id
+            ORDER BY p.created_at DESC
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function countTotal()
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) as count FROM polls");
+        $stmt->execute();
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return (int) $row['count'];
+    }
+
+    public function countActive()
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) as count FROM polls WHERE status = 'active'");
+        $stmt->execute();
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return (int) $row['count'];
+    }
 }

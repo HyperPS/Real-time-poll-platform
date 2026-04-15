@@ -51,7 +51,9 @@ class Router
     {
         $method = $_SERVER['REQUEST_METHOD'];
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $uri = str_replace('/Secure-transport/Mohit', '', $uri); // Adjust for local path
+        // Strip /public prefix if webroot isn't set to public/ directory
+        $uri = preg_replace('#^/public#', '', $uri);
+        if (empty($uri)) $uri = '/';
 
         // Try to match route
         foreach ($this->routes as $route) {
@@ -163,6 +165,13 @@ $router->post('/api/admin/vote/release', 'AdminController', 'releaseVote');
 $router->get('/api/admin/vote-history', 'AdminController', 'getVoteHistory');
 $router->post('/api/admin/poll/status', 'AdminController', 'togglePollStatus');
 $router->post('/api/admin/poll/delete', 'AdminController', 'deletePoll');
+
+// Admin extended API endpoints
+$router->get('/api/admin/activity-logs', 'AdminController', 'getActivityLogs');
+$router->post('/api/admin/user/create', 'AdminController', 'createUser');
+$router->post('/api/admin/user/delete', 'AdminController', 'deleteUser');
+$router->get('/api/admin/user/stats', 'AdminController', 'getUserStats');
+$router->get('/api/admin/votes', 'AdminController', 'getVotesForDashboard');
 
 // Dispatch the request
 $router->dispatch();

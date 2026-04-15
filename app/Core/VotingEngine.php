@@ -21,7 +21,7 @@ class VotingEngine
      * Validate and process a vote
      * Core business logic for IP-restricted voting
      */
-    public function castVote($pollId, $optionId, $ipAddress)
+    public function castVote($pollId, $optionId, $ipAddress, $userId = null, $userAgent = '')
     {
         try {
             // Sanitize inputs
@@ -51,7 +51,7 @@ class VotingEngine
             }
 
             // Store the vote
-            $voteId = $this->storeVote($pollId, $optionId, $ipAddress);
+            $voteId = $this->storeVote($pollId, $optionId, $ipAddress, $userId, $userAgent);
 
             if (!$voteId) {
                 return ['success' => false, 'message' => 'Failed to record vote'];
@@ -59,7 +59,7 @@ class VotingEngine
 
             // Log vote action
             $this->logVoteHistory($pollId, $optionId, $ipAddress, 'vote', 
-                ['vote_id' => $voteId, 'timestamp' => date('Y-m-d H:i:s')]);
+                ['vote_id' => $voteId, 'timestamp' => date('Y-m-d H:i:s')], $userId);
 
             return [
                 'success' => true,
@@ -287,7 +287,10 @@ class VotingEngine
                 FROM votes v
                 JOIN poll_options po ON v.option_id = po.id
                 WHERE v.poll_id = ?
-                GROUP BY v.ip_address
+                AND v.id = (
+                    SELECT MAX(v2.id) FROM votes v2 
+                    WHERE v2.poll_id = v.poll_id AND v2.ip_address = v.ip_address
+                )
                 ORDER BY v.voted_at DESC
             ");
             $stmt->execute([$pollId, $pollId]);
@@ -323,13 +326,13 @@ class VotingEngine
     /**
      * Store a vote in database
      */
-    private function storeVote($pollId, $optionId, $ipAddress)
+    private function storeVote($pollId, $optionId, $ipAddress, $userId = null, $userAgent = '')
     {
         $stmt = $this->pdo->prepare("
-            INSERT INTO votes (poll_id, option_id, ip_address, voted_at, is_active)
-            VALUES (?, ?, ?, NOW(), TRUE)
+            INSERT INTO votes (poll_id, option_id, ip_address, user_id, user_agent, voted_at, is_active)
+            VALUES (?, ?, ?, ?, ?, NOW(), TRUE)
         ");
-        $result = $stmt->execute([$pollId, $optionId, $ipAddress]);
+        $result = $stmt->execute([$pollId, $optionId, $ipAddress, $userId, $userAgent]);
 
         return $result ? $this->pdo->lastInsertId() : false;
     }
@@ -337,11 +340,11 @@ class VotingEngine
     /**
      * Log vote action to history table
      */
-    private function logVoteHistory($pollId, $optionId, $ipAddress, $action, $details = [])
+    private function logVoteHistory($pollId, $optionId, $ipAddress, $action, $details = [], $userId = null)
     {
         $stmt = $this->pdo->prepare("
-            INSERT INTO vote_history (poll_id, option_id, ip_address, action_type, timestamp, details)
-            VALUES (?, ?, ?, ?, NOW(), ?)
+            INSERT INTO vote_history (poll_id, option_id, ip_address, action_type, timestamp, details, user_id)
+            VALUES (?, ?, ?, ?, NOW(), ?, ?)
         ");
 
         return $stmt->execute([
@@ -349,7 +352,8 @@ class VotingEngine
             $optionId,
             $ipAddress,
             $action,
-            json_encode($details)
+            json_encode($details),
+            $userId
         ]);
     }
 

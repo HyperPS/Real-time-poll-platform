@@ -3,198 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $title ?? 'Real-Time Poll System'; ?></title>
+    <title><?php echo $title ?? 'Poll Platform'; ?></title>
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
+    <!-- Font Awesome 6.4 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/public/css/style.css">
-    
-    <!-- Three.js for 3D effects -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-    <style>
-        :root {
-            --primary-color: #4f46e5;
-            --secondary-color: #10b981;
-            --danger-color: #ef4444;
-            --dark-bg: #0f172a;
-            --card-bg: #1e293b;
-        }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .navbar {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.5rem;
-            color: #fff !important;
-        }
-
-        .card {
-            border: none;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            transform-style: preserve-3d;
-        }
-
-        .card:hover {
-            transform: translateY(-5px) rotateX(2deg);
-            box-shadow: 0 12px 48px rgba(79, 70, 229, 0.3);
-        }
-
-        .btn-primary {
-            background: var(--primary-color);
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background: #4338ca;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
-        }
-
-        .btn-success {
-            background: var(--secondary-color);
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-danger {
-            background: var(--danger-color);
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
-        }
-
-        .alert {
-            border-radius: 8px;
-            border: none;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .spinner-border {
-            color: var(--primary-color);
-        }
-
-        .badge {
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-weight: 600;
-        }
-
-        .badge-primary {
-            background: var(--primary-color);
-        }
-
-        .badge-success {
-            background: var(--secondary-color);
-        }
-
-        .table {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        tbody tr:hover {
-            background: rgba(79, 70, 229, 0.05);
-        }
-
-        .progress {
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            height: 8px;
-        }
-
-        .progress-bar {
-            background: var(--primary-color);
-        }
-
-        .text-muted {
-            color: rgba(0, 0, 0, 0.6) !important;
-        }
-
-        .container {
-            max-width: 1200px;
-        }
-
-        @media (max-width: 768px) {
-            .card {
-                margin-bottom: 1rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <!-- Navigation -->
     <?php if (isset($_SESSION['user_id'])): ?>
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="/dashboard">
-                🗳️ Real-Time Poll System
+                <i class="fas fa-chart-bar"></i> Poll Platform
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                        <a class="nav-link" href="/dashboard">
+                            <i class="fas fa-th-large me-1"></i> Dashboard
+                        </a>
                     </li>
                     <?php if ($_SESSION['user_role'] === 'admin'): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="/admin/dashboard">Admin Panel</a>
+                        <a class="nav-link" href="/admin/dashboard">
+                            <i class="fas fa-shield-alt me-1"></i> Admin Panel
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/polls/create">Create Poll</a>
+                        <a class="nav-link" href="/polls/create">
+                            <i class="fas fa-plus me-1"></i> Create Poll
+                        </a>
                     </li>
                     <?php endif; ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <?php echo escape($_SESSION['user_name']); ?>
+                            <i class="fas fa-user-circle me-1"></i> <?php echo escape($_SESSION['user_name']); ?>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-1"></i> Logout</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -203,17 +61,19 @@
     </nav>
     <?php endif; ?>
 
-    <!-- Messages -->
-    <div class="container mt-4">
+    <!-- Session Messages -->
+    <div class="container">
         <?php if (isset($_SESSION['error'])): ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            <i class="fas fa-exclamation-circle me-1"></i>
             <?php echo escape($_SESSION['error']); unset($_SESSION['error']); ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['success'])): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            <i class="fas fa-check-circle me-1"></i>
             <?php echo escape($_SESSION['success']); unset($_SESSION['success']); ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
@@ -226,17 +86,17 @@
     </div>
 
     <!-- Footer -->
-    <footer class="text-center text-white mt-5 pb-4">
-        <p class="text-muted">&copy; 2026 Real-Time Poll Platform. Built with Laravel & AJAX.</p>
+    <footer class="text-center mt-5 pb-4">
+        <small class="text-muted">&copy; 2026 Poll Platform</small>
     </footer>
 
-    <!-- Bootstrap JS -->
+    <!-- Bootstrap 5.3 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- jQuery -->
+    <!-- jQuery 3.6 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- Custom JS -->
-    <script src="/public/js/app.js"></script>
+    <script src="/js/app.js"></script>
 </body>
 </html>

@@ -1,7 +1,6 @@
 -- Real-Time Live Poll Platform - Database Schema
+-- Auto-loaded by Docker on first run
 
--- Create database
-CREATE DATABASE IF NOT EXISTS polling_system;
 USE polling_system;
 
 -- Users table
@@ -113,8 +112,29 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 -- Default admin (password: admin123)
 INSERT INTO users (name, email, password, role) VALUES 
-('Admin User', 'admin@polling.test', '$2y$10$NUe1Tn0WCwPrjg.v3xI7QOfL7RLlm2zYwQHQvJVSWCx3QJqXj9wXi', 'admin');
+('Admin User', 'admin@polling.test', '$2y$10$YSMTyj2Ur4vQVTS34t4o6eGxJraURk9rD1tFTjuqrIES7ks48wpDe', 'admin');
 
 -- Default user (password: user123)
 INSERT INTO users (name, email, password, role) VALUES 
-('Test User', 'user@polling.test', '$2y$10$Z00N8zGVl2a8LKhVhbJdFuYGGy6jSDzOVWnSqh33yOqBBXvhJ5rOK', 'user');
+('Test User', 'user@polling.test', '$2y$10$rHeEUjGweOgpkEglUXWnJeYHd8RfG9xybL7Kh8jxx1PVTtmf55lkK', 'user');
+
+-- Sample polls
+INSERT INTO polls (question, status, created_by) VALUES
+('What is your favorite programming language?', 'active', 1),
+('Which framework do you prefer for web development?', 'active', 1),
+('Best database for small to medium projects?', 'active', 1);
+
+-- Poll options
+INSERT INTO poll_options (poll_id, option_text) VALUES
+(1, 'PHP'),
+(1, 'Python'),
+(1, 'JavaScript'),
+(1, 'Java'),
+(2, 'Laravel'),
+(2, 'React'),
+(2, 'Vue.js'),
+(2, 'Angular'),
+(3, 'MySQL'),
+(3, 'PostgreSQL'),
+(3, 'SQLite'),
+(3, 'MongoDB');

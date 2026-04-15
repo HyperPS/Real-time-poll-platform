@@ -47,9 +47,18 @@ class AuthController
             $_SESSION['user_role'] = $user['role'];
             $_SESSION['user_email'] = $user['email'];
 
+            // Update last login timestamp
+            $this->userModel->updateLastLogin($user['id']);
+
+            // Log successful login
+            log_activity($this->pdo, $user['id'], 'login_success', 'User logged in: ' . $user['email']);
+
             header('Location: /dashboard');
             exit;
         } else {
+            // Log failed login attempt
+            log_activity($this->pdo, null, 'login_failed', 'Failed login attempt for: ' . $email);
+
             $_SESSION['error'] = 'Invalid email or password';
             return 'auth/login';
         }

@@ -6,17 +6,19 @@
  */
 
 // Start session
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Set error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Database configuration
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'polling_system');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// Database configuration — use environment variables (Docker) with fallback
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_NAME', getenv('DB_NAME') ?: 'polling_system');
+define('DB_USER', getenv('DB_USER') ?: 'root');
+define('DB_PASS', getenv('DB_PASS') ?: '');
 define('DB_CHARSET', 'utf8mb4');
 
 // CSRF Token generation
@@ -61,5 +63,5 @@ spl_autoload_register(function($class) {
 // Load helper functions
 require __DIR__ . '/../app/helpers.php';
 
-// Load routes
-require __DIR__ . '/routes/web.php';
+// Load routes — FIXED: correct path to routes/web.php
+require __DIR__ . '/../routes/web.php';

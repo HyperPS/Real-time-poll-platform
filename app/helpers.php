@@ -99,6 +99,96 @@ function request_method()
     return $_SERVER['REQUEST_METHOD'];
 }
 
+// ===== ACTIVITY LOGGING =====
+
+/**
+ * Log user activity with forensic data
+ */
+function log_activity($pdo, $userId, $action, $description = '', $extraData = [])
+{
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    $ipAddress = $_SERVER['HTTP_CLIENT_IP']
+        ?? explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '')[0]
+        ?? $_SERVER['REMOTE_ADDR']
+        ?? '127.0.0.1';
+    $ipAddress = trim($ipAddress);
+    if (!filter_var($ipAddress, FILTER_VALIDATE_IP)) {
+        $ipAddress = '127.0.0.1';
+    }
+
+    $deviceType = parse_device_type($userAgent);
+    $browser = parse_browser($userAgent);
+    $osPlatform = parse_os($userAgent);
+    $referrer = $_SERVER['HTTP_REFERER'] ?? '';
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+    $requestMethod = $_SERVER['REQUEST_METHOD'] ?? '';
+    $sessionId = session_id() ?: '';
+
+    $stmt = $pdo->prepare("
+        INSERT INTO activity_logs
+            (user_id, action, description, ip_address, user_agent, device_type, browser, os_platform, referrer, request_uri, request_method, session_id, extra_data, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+    ");
+    $stmt->execute([
+        $userId,
+        $action,
+        $description,
+        $ipAddress,
+        $userAgent,
+        $deviceType,
+        $browser,
+        $osPlatform,
+        $referrer,
+        $requestUri,
+        $requestMethod,
+        $sessionId,
+        json_encode($extraData)
+    ]);
+}
+
+/**
+ * Parse device type from user agent string
+ */
+function parse_device_type($ua)
+{
+    $ua = strtolower($ua);
+    if (preg_match('/mobile|android.*mobile|iphone|ipod|blackberry|iemobile|opera mini/', $ua)) {
+        return 'mobile';
+    }
+    if (preg_match('/tablet|ipad|android(?!.*mobile)|kindle|silk/', $ua)) {
+        return 'tablet';
+    }
+    return 'desktop';
+}
+
+/**
+ * Parse browser name from user agent string
+ */
+function parse_browser($ua)
+{
+    if (preg_match('/Edg\//i', $ua)) return 'Edge';
+    if (preg_match('/OPR\//i', $ua)) return 'Opera';
+    if (preg_match('/Chrome\//i', $ua) && !preg_match('/Edg\//i', $ua)) return 'Chrome';
+    if (preg_match('/Safari\//i', $ua) && !preg_match('/Chrome\//i', $ua)) return 'Safari';
+    if (preg_match('/Firefox\//i', $ua)) return 'Firefox';
+    if (preg_match('/MSIE|Trident/i', $ua)) return 'Internet Explorer';
+    return 'Unknown';
+}
+
+/**
+ * Parse OS platform from user agent string
+ */
+function parse_os($ua)
+{
+    if (preg_match('/Windows NT/i', $ua)) return 'Windows';
+    if (preg_match('/Macintosh|Mac OS X/i', $ua)) return 'macOS';
+    if (preg_match('/Linux/i', $ua) && !preg_match('/Android/i', $ua)) return 'Linux';
+    if (preg_match('/Android/i', $ua)) return 'Android';
+    if (preg_match('/iPhone|iPad|iPod/i', $ua)) return 'iOS';
+    if (preg_match('/CrOS/i', $ua)) return 'Chrome OS';
+    return 'Unknown';
+}
+
 /**
  * Check if POST request
  */

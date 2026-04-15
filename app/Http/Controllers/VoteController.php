@@ -47,9 +47,20 @@ class VoteController
 
         // Get client IP
         $ipAddress = $this->getClientIp();
+        $userId = $_SESSION['user_id'] ?? null;
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
         // Cast vote using VotingEngine
-        $result = $this->votingEngine->castVote($pollId, $optionId, $ipAddress);
+        $result = $this->votingEngine->castVote($pollId, $optionId, $ipAddress, $userId, $userAgent);
+
+        // Log vote activity
+        if ($result['success']) {
+            log_activity($this->pdo, $userId, 'vote_cast', "Voted on poll {$pollId}, option {$optionId}", [
+                'poll_id' => $pollId,
+                'option_id' => $optionId,
+                'vote_id' => $result['vote_id'] ?? null
+            ]);
+        }
 
         // Set response code
         http_response_code($result['success'] ? 200 : 400);
